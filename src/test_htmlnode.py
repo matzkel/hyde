@@ -22,6 +22,10 @@ class TestHTMLNode(unittest.TestCase):
             "src=\"about:blank\" alt=\"Blank page\"", node.props_to_html()
         )
 
+    def test_props_to_html_error(self):
+        node = HTMLNode()
+        self.assertRaises(ValueError, node.props_to_html)
+
     def test_repr(self):
         node = HTMLNode("p", "Hello, World!")
         self.assertEqual(
