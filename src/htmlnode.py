@@ -9,6 +9,9 @@ class HTMLNode():
         raise NotImplementedError()
 
     def props_to_html(self):
+        if self.props is None:
+            raise ValueError("props dictionary is empty")
+        
         props = []
         for key, value in self.props.items():
             props.append(f"{key}=\"{value}\"")
@@ -16,3 +19,24 @@ class HTMLNode():
 
     def __repr__(self):
         return f"HTMLNode(\n{self.tag},\n{self.value},\n{self.children},\n{self.props}\n)"
+
+
+class LeafNode(HTMLNode):
+    def __init__(self, tag=None, value=None, props=None):
+        super().__init__(tag, value, None, props)
+    
+    def to_html(self):
+        if self.value is None:
+            raise ValueError("Leaf node requires value")
+
+        if self.tag is None: # If there is no tag, the value will be rendered as raw text
+            return self.value
+
+        try:
+            props_str = self.props_to_html()
+            return f"<{self.tag} {props_str}>{self.value}</{self.tag}>"
+        except:
+            return f"<{self.tag}>{self.value}</{self.tag}>"
+            
+    def __repr__(self):
+        return f"LeafNode(\n{self.tag},\n{self.value},\n{self.props}\n)"
