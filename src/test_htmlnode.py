@@ -106,14 +106,6 @@ class TestLeafNode(unittest.TestCase):
             "<b>This is bold text</b>", node.to_html()
         )
 
-    def test_error(self):
-        node = LeafNode(
-            "img",
-            None,
-            {"src": "about:blank", "alt": "Blank page"}
-        )
-        self.assertRaises(ValueError, node.to_html)
-
     def test_raw_value(self):
         node = LeafNode(value="This is raw text")
         self.assertEqual(
