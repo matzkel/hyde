@@ -1,6 +1,6 @@
 import unittest
 
-from textnode import TextNode, TextType
+from textnode import TextNode, TextType, text_node_to_html_node
 
 
 class TestTextNode(unittest.TestCase):
@@ -28,6 +28,25 @@ class TestTextNode(unittest.TestCase):
         node = TextNode("This is bold text node", TextType.BOLD)
         self.assertEqual(
             "TextNode(This is bold text node, TextType.BOLD, None)", repr(node)
+        )
+
+    def test_conversion(self):
+        node = TextNode("This is bold text!", TextType.BOLD)
+        node2 = text_node_to_html_node(node)
+        self.assertEqual(
+            "LeafNode(b, This is bold text!, None)", repr(node2)
+        )
+
+    def test_conversion2(self):
+        node = TextNode(
+            "This is a blank page!",
+            TextType.IMAGE,
+            "about:blank"
+        )
+        node2 = text_node_to_html_node(node)
+        self.assertEqual(
+            "LeafNode(img, None, {'src': 'about:blank', 'alt': 'This is a blank page!'})",
+            repr(node2)
         )
 
 if __name__ == "__main__":
