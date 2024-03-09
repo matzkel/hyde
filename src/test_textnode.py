@@ -1,6 +1,6 @@
 import unittest
 
-from textnode import TextNode, TextType, text_node_to_html_node
+from textnode import TextNode, TextType, text_node_to_html_node, split_nodes_delimiter
 
 
 class TestTextNode(unittest.TestCase):
@@ -47,6 +47,25 @@ class TestTextNode(unittest.TestCase):
         self.assertEqual(
             "LeafNode(img, None, {'src': 'about:blank', 'alt': 'This is a blank page!'})",
             repr(node2)
+        )
+
+    def test_split_nodes_delimiter(self):
+        node = TextNode("This **word** is bold", TextType.TEXT)
+        result = split_nodes_delimiter([node], "**", TextType.BOLD)
+        self.assertEqual(
+            "[TextNode(This , TextType.TEXT, None), TextNode(word, TextType.BOLD, None), TextNode( is bold, TextType.TEXT, None)]",
+            repr(result)
+        )
+
+    def test_split_nodes_delimiter2(self):
+        nodes = [
+            TextNode("This **word** is bold", TextType.TEXT),
+            "This one is just raw text"
+        ]
+        result = split_nodes_delimiter(nodes, "**", TextType.BOLD)
+        self.assertEqual(
+            "[TextNode(This , TextType.TEXT, None), TextNode(word, TextType.BOLD, None), TextNode( is bold, TextType.TEXT, None), TextNode(This one is just raw text, TextType.TEXT, None)]",
+            repr(result)
         )
 
 if __name__ == "__main__":
