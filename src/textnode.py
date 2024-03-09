@@ -44,3 +44,34 @@ def text_node_to_html_node(text_node):
         return LeafNode("img", None, {"src": text_node.url, "alt": text_node.text})
     else:
         raise ValueError("TextNode should take TextType argument")
+
+
+# SUPPORTS ONLY SINGLE LEVEL OF NESTING!!!
+# TODO: Add support for multiple levels of nesting
+def split_nodes_delimiter(old_nodes, delimiter, text_type):
+    if not isinstance(old_nodes, list):
+        raise TypeError("old_nodes accepts only list object")
+    
+    if len(old_nodes) < 1:
+        raise ValueError("old_nodes must have atleast 1 object")
+
+    if not isinstance(text_type, TextType):
+        raise TypeError("text_type accepts only TextType value")
+
+    new_nodes = []
+    for node in old_nodes:
+        # If it encounters something that's not TextNode, treat it as a raw text
+        if not isinstance(node, TextNode):
+            new_nodes.append(TextNode(str(node), TextType.TEXT))
+            continue
+        
+        splitted = node.text.split(delimiter)
+        if len(splitted) != 3:
+            raise Exception("Closing delimiter not found or too much indentation")
+        
+        # Fix this mess later, maybe
+        new_nodes.append(TextNode(splitted[0], node.text_type, node.url))
+        new_nodes.append(TextNode(splitted[1], text_type, node.url))
+        new_nodes.append(TextNode(splitted[2], node.text_type, node.url))
+
+    return new_nodes
