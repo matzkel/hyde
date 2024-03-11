@@ -78,6 +78,65 @@ def split_nodes_delimiter(old_nodes, delimiter, text_type):
     return new_nodes
 
 
+def split_nodes_image(old_nodes):
+    if not isinstance(old_nodes, list):
+        raise TypeError("old_nodes accepts only list object")
+
+    if len(old_nodes) < 1:
+        raise ValueError("old_nodes must have atleast 1 object")
+
+    new_nodes = []
+    for node in old_nodes:
+        # If it encounters something that's not TextNode, treat it as a raw text
+        if not isinstance(node, TextNode):
+            node = TextNode(node, TextType.TEXT)
+
+        images = extract_markdown_images(node.text)
+        if len(images) < 1:
+            new_nodes.append(node)
+            continue
+
+        text = node.text
+        for image_tup in images:
+            splitted = text.split(f"![{image_tup[0]}]({image_tup[1]})", 1)
+
+            new_nodes.append(TextNode(splitted[0], node.text_type, node.url))
+            new_nodes.append(TextNode(image_tup[0], TextType.IMAGE, image_tup[1]))
+
+            text = splitted[1]
+    
+    return new_nodes
+
+def split_nodes_link(old_nodes):
+    if not isinstance(old_nodes, list):
+        raise TypeError("old_nodes accepts only list object")
+
+    if len(old_nodes) < 1:
+        raise ValueError("old_nodes must have atleast 1 object")
+
+    new_nodes = []
+    for node in old_nodes:
+        # If it encounters something that's not TextNode, treat it as a raw text
+        if not isinstance(node, TextNode):
+            node = TextNode(node, TextType.TEXT)
+
+        links = extract_markdown_links(node.text)
+        if len(links) < 1:
+            new_nodes.append(node)
+            continue
+
+        text = node.text
+        for link_tup in links:
+            splitted = text.split(f"[{link_tup[0]}]({link_tup[1]})", 1)
+
+            new_nodes.append(TextNode(splitted[0], node.text_type, node.url))
+            new_nodes.append(TextNode(link_tup[0], TextType.LINK, link_tup[1]))
+
+            text = splitted[1]
+    
+    return new_nodes
+
+
 def extract_markdown_images(text):
     return re.findall(r"!\[(.*?)\]\((.*?)\)", text)
 
