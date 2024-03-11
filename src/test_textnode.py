@@ -7,7 +7,9 @@ from textnode import (
     text_node_to_html_node,
     split_nodes_delimiter,
     extract_markdown_images,
-    extract_markdown_links
+    extract_markdown_links,
+    split_nodes_image,
+    split_nodes_link
 )
 
 
@@ -88,6 +90,34 @@ class TestTextNode(unittest.TestCase):
         self.assertEqual(
             [('link', 'https://www.example.com'), ('another', 'https://www.example.com/another')],
             extract_markdown_links(text)
+        )
+
+    def test_split_nodes_image(self):
+        node = TextNode(
+            "This is text with an ![image](https://i.imgur.com/zjjcJKZ.png) and another ![second image](https://i.imgur.com/3elNhQu.png)",
+            TextType.TEXT
+        )
+        self.assertEqual(
+            [
+                TextNode("This is text with an ", TextType.TEXT, None),
+                TextNode("image", TextType.IMAGE, "https://i.imgur.com/zjjcJKZ.png"),
+                TextNode(" and another ", TextType.TEXT, None),
+                TextNode("second image", TextType.IMAGE, "https://i.imgur.com/3elNhQu.png")
+            ], split_nodes_image([node])
+        )
+
+    def test_split_nodes_links(self):
+        node = TextNode(
+            "This is text with a [link](https://www.example.com) and [another](https://www.example.com/another)",
+            TextType.TEXT
+        )
+        self.assertEqual(
+            [
+                TextNode("This is text with a ", TextType.TEXT, None),
+                TextNode("link", TextType.LINK, "https://www.example.com"),
+                TextNode(" and ", TextType.TEXT, None),
+                TextNode("another", TextType.LINK, "https://www.example.com/another")
+            ], split_nodes_link([node])
         )
 
 
