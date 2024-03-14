@@ -4,12 +4,13 @@ from textnode import (
     TextNode,
     TextType,
 
+    text_to_text_node,
     text_node_to_html_node,
     split_nodes_delimiter,
     extract_markdown_images,
     extract_markdown_links,
     split_nodes_image,
-    split_nodes_link
+    split_nodes_link,
 )
 
 
@@ -118,6 +119,37 @@ class TestTextNode(unittest.TestCase):
                 TextNode(" and ", TextType.TEXT, None),
                 TextNode("another", TextType.LINK, "https://www.example.com/another")
             ], split_nodes_link([node])
+        )
+
+    def test_text_to_text_node(self):
+        text = "This is **text** with an *italic* word and a `code block` and an ![image](https://i.imgur.com/zjjcJKZ.png) and a [link](https://google.com)"
+        self.assertEqual(
+            [
+                TextNode("This is ", TextType.TEXT, None),
+                TextNode("text", TextType.BOLD, None),
+                TextNode(" with an ", TextType.TEXT, None),
+                TextNode("italic", TextType.ITALIC, None),
+                TextNode(" word and a ", TextType.TEXT, None),
+                TextNode("code block", TextType.CODE, None),
+                TextNode(" and an ", TextType.TEXT, None),
+                TextNode("image", TextType.IMAGE, "https://i.imgur.com/zjjcJKZ.png"),
+                TextNode(" and a ", TextType.TEXT, None),
+                TextNode("link", TextType.LINK, "https://google.com")
+            ], text_to_text_node(text)
+        )
+
+    def test_text_to_text_node2(self):
+        text = "This **word** should be bold, and this one should be *italic*! Here is the [link](https://example.com)."
+        self.assertEqual(
+            [
+                TextNode("This ", TextType.TEXT, None),
+                TextNode("word", TextType.BOLD, None),
+                TextNode(" should be bold, and this one should be ", TextType.TEXT, None),
+                TextNode("italic", TextType.ITALIC, None),
+                TextNode("! Here is the ", TextType.TEXT, None),
+                TextNode("link", TextType.LINK, "https://example.com"),
+                TextNode(".", TextType.TEXT, None)
+            ], text_to_text_node(text)
         )
 
 
