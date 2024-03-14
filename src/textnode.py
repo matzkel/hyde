@@ -30,6 +30,16 @@ class TextNode():
         return f"TextNode({self.text}, {self.text_type}, {self.url})"
 
 
+def text_to_text_node(text):
+    nodes = split_nodes_delimiter([text], "**", TextType.BOLD)
+    nodes = split_nodes_delimiter(nodes, "*", TextType.ITALIC)
+    nodes = split_nodes_delimiter(nodes, "`", TextType.CODE)
+
+    nodes = split_nodes_image(nodes)
+    nodes = split_nodes_link(nodes)
+    return nodes
+
+
 def text_node_to_html_node(text_node):
     if text_node.text_type == TextType.TEXT:
         return LeafNode(None, text_node.text)
@@ -63,12 +73,12 @@ def split_nodes_delimiter(old_nodes, delimiter, text_type):
     for node in old_nodes:
         # If it encounters something that's not TextNode, treat it as a raw text
         if not isinstance(node, TextNode):
-            new_nodes.append(TextNode(str(node), TextType.TEXT))
-            continue
+            node = TextNode(node, TextType.TEXT)
         
         splitted = node.text.split(delimiter)
-        if len(splitted) != 3:
-            raise Exception("Closing delimiter not found or too much indentation")
+        if len(splitted) != 3: # Closing delimiter not found or too much indentation
+            new_nodes.append(node)
+            continue
         
         # Fix this mess later, maybe
         new_nodes.append(TextNode(splitted[0], node.text_type, node.url))
@@ -104,6 +114,9 @@ def split_nodes_image(old_nodes):
             new_nodes.append(TextNode(image_tup[0], TextType.IMAGE, image_tup[1]))
 
             text = splitted[1]
+        
+        if text != '':
+            new_nodes.append(TextNode(text, node.text_type, node.url))
     
     return new_nodes
 
@@ -134,6 +147,9 @@ def split_nodes_link(old_nodes):
 
             text = splitted[1]
     
+        if text != '':
+            new_nodes.append(TextNode(text, node.text_type, node.url))
+
     return new_nodes
 
 
