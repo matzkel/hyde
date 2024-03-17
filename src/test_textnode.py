@@ -1,11 +1,13 @@
 import unittest
 
 from textnode import (
+    BlockType,
     TextNode,
     TextType,
 
     text_to_text_node,
     text_node_to_html_node,
+    block_to_block_type,
     markdown_to_blocks,
     split_nodes_delimiter,
     extract_markdown_images,
@@ -190,6 +192,23 @@ class TestTextNode(unittest.TestCase):
                 "* and item 2"
             ], markdown_to_blocks(markdown)
         )
+    
+    def test_block_to_block_type(self):
+        block = "1. This is an ordered list"
+        self.assertEqual(BlockType.ORDERED_LIST, block_to_block_type(block))
+
+    def test_block_to_block_type2(self):
+        block = "```This is not a code block!"
+        self.assertEqual(BlockType.PARAGRAPH, block_to_block_type(block))
+
+    def test_block_to_block_type3(self):
+        block = "###This is huge heading!"
+        self.assertEqual(BlockType.HEADING, block_to_block_type(block))
+
+    def test_block_to_block_type4(self):
+        block = ""
+        self.assertEqual(BlockType.PARAGRAPH, block_to_block_type(block))
+
 
 if __name__ == "__main__":
     unittest.main()
