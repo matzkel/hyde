@@ -83,8 +83,9 @@ def block_to_block_type(block):
 def markdown_to_blocks(markdown):
     blocks = []
     for line in markdown.split("\n"):
-        result_line = line.strip() if line != '\n' else ""
-        blocks.append(result_line)
+        result_line = line.strip()
+        if result_line != "":
+            blocks.append(result_line)
     return blocks
 
 
